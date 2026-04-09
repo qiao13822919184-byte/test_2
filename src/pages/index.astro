@@ -11,7 +11,7 @@ const base = import.meta.env.BASE_URL;
         <h2>{item.name}</h2>
         <p>价格: ${item.price}</p>
         <p>{item.desc}</p>
-        <a href={`${base}products/${item.id}`} style="color: #007bff; text-decoration: none;">查看详情</a>
+        <a href={`${base}/products/${item.id}`} style="color: #007bff; text-decoration: none;">查看详情</a>
       </div>
     ))}
   </div>
