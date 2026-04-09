@@ -1,0 +1,14 @@
+[
+  {
+    "id": "iphone15",
+    "name": "iPhone 15 Pro",
+    "price": 999,
+    "desc": "最新款苹果手机"
+  },
+  {
+    "id": "macbook",
+    "name": "MacBook Pro 14",
+    "price": 1999,
+    "desc": "M3芯片，性能怪兽"
+  }
+]

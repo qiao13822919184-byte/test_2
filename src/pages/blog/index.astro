@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// 扫描所有 md 文件
+const postFiles = import.meta.glob('./*.md', { eager: true });
+const posts = Object.values(postFiles);
+
+// 按日期倒序
+posts.sort((a, b) => {
+  const dateA = a.frontmatter.date ? Date.parse(a.frontmatter.date) : 0;
+  const dateB = b.frontmatter.date ? Date.parse(b.frontmatter.date) : 0;
+  return dateB - dateA;
+});
+---
+<BaseLayout title="博客列表">
+  <h1 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">最新文章</h1>
+  <div>
+    {posts.map((post) => (
+      <div style="padding: 15px 0; border-bottom: 1px dashed #ccc;">
+        <h2 style="margin: 0 0 5px 0; font-size: 1.4em;">
+          <a href={post.url} style="text-decoration: none; color: #007bff;">{post.frontmatter.title}</a>
+        </h2>
+        <div style="color: #888; font-size: 0.9em;">发布日期: {post.frontmatter.date}</div>
+      </div>
+    ))}
+  </div>
+</BaseLayout>

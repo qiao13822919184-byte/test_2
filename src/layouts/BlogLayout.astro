@@ -1,0 +1,18 @@
+---
+import BaseLayout from './BaseLayout.astro';
+const { frontmatter } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title={frontmatter.title}>
+  <a href={`${base}/blog`} style="color: #666; text-decoration: none;">⬅ 返回博客列表</a>
+  
+  <h1 style="margin-top: 20px;">{frontmatter.title}</h1>
+  <div style="color: gray; font-size: 0.9em; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+    作者: {frontmatter.author} | 发布日期: {frontmatter.date}
+  </div>
+
+  <article style="line-height: 1.8; color: #333;">
+    <!-- Markdown 内容注入点 -->
+    <slot />
+  </article>
+</BaseLayout>

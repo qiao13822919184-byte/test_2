@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import products from '../data/products.json';
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="首页">
+  <h1>欢迎来到我的商店</h1>
+  <div class="product-list">
+    {products.map((item) => (
+      <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px;">
+        <h2>{item.name}</h2>
+        <p>价格: ${item.price}</p>
+        <p>{item.desc}</p>
+        <a href={`${base}products/${item.id}`} style="color: #007bff; text-decoration: none;">查看详情</a>
+      </div>
+    ))}
+  </div>
+</BaseLayout>
