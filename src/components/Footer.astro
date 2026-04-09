@@ -1,6 +1,9 @@
----
-const year = new Date().getFullYear();
----
-<footer style="text-align: center; padding: 20px; border-top: 1px solid #ccc; margin-top: 40px;">
-  <p>&copy; {year} 我的独立站. All rights reserved.</p>
+<footer class="bg-gray-50 border-t border-gray-200 mt-20">
+  <div class="max-w-6xl mx-auto px-4 py-12 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+    <p>© {new Date().getFullYear()} ACME Tech. All rights reserved.</p>
+    <div class="flex gap-4 mt-4 md:mt-0">
+      <a href="#" class="hover:text-black">隐私政策</a>
+      <a href="#" class="hover:text-black">服务条款</a>
+    </div>
+  </div>
 </footer>

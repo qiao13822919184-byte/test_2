@@ -1,0 +1,28 @@
+---
+const { 
+  title, 
+  description = "ACME Tech - 探索极致科技，全球极客的选择。", 
+  image = "/default-og.png", // 你可以在 public 目录下放一张默认的分享图
+} = Astro.props;
+
+// 生成当前页面的规范链接 (Canonical URL)，防止谷歌因为参数不同认为你有重复内容
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url);
+---
+
+<!-- 基础 TDK -->
+<title>{title} | ACME 独立站</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Open Graph / Facebook (社交媒体分享卡片) -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.site || Astro.url)} />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={new URL(image, Astro.site || Astro.url)} />

@@ -1,11 +1,23 @@
 ---
-// 自动读取 astro.config.mjs 中的 base 路径，完美解决子页面跳转 404
 const base = import.meta.env.BASE_URL;
 ---
-<header style="background: #333; color: white; padding: 15px; text-align: center;">
-  <nav>
-    <a href={base} style="color: white; margin: 0 15px; text-decoration: none;">🏠 首页</a>
-    <a href={`${base}/blog`} style="color: white; margin: 0 15px; text-decoration: none;">✍️ 博客</a>
-    <a href={`${base}/information`} style="color: white; margin: 0 15px; text-decoration: none;">✍️ 关于我们</a>
-  </nav>
+<header class="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 border-b border-gray-100 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <!-- Logo 区域 -->
+    <a href={base} class="text-2xl font-black tracking-tighter text-gray-900 hover:text-blue-600 transition-colors">
+      ACME<span class="text-blue-600">.</span>
+    </a>
+    
+    <!-- 桌面端导航 -->
+    <nav class="hidden md:flex gap-8 font-medium text-gray-600">
+      <a href={base} class="hover:text-black transition-colors">首页</a>
+      <a href={`${base}/products`} class="hover:text-black transition-colors">所有产品</a>
+      <a href={`${base}/blog`} class="hover:text-black transition-colors">技术博客</a>
+    </nav>
+
+    <!-- 行动按钮 (CTA) -->
+    <a href="https://wa.me/+8613822919184" target="_blank" class="hidden md:inline-flex bg-black text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition-transform hover:scale-105">
+      联系我们
+    </a>
+  </div>
 </header>

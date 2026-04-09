@@ -1,17 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import products from '../data/products.json';
+// 1. 引入 Astro 原生图片组件
+import { Image } from 'astro:assets';
+// 2. 引入本地高清大图（注意：Astro 会在构建时自动处理它）
+import heroImage from '../assets/hero.jpg';
+
 const base = import.meta.env.BASE_URL;
 ---
+
 <BaseLayout title="首页">
-  <h1>欢迎来到我的商店</h1>
-  <div class="product-list">
-    {products.map((item) => (
-      <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px;">
-        <h2>{item.name}</h2>
-        <p>价格: ${item.price}</p>
-        <p>{item.desc}</p>
-        <a href={`${base}/products/${item.id}`} style="color: #007bff; text-decoration: none;">查看详情</a>
+  <!-- Hero Section (首屏视觉) -->
+  <section class="relative w-full h-[60vh] flex items-center justify-center overflow-hidden rounded-xl mb-12">
+    <!-- Astro 图片魔法：自动转 WebP，自动裁剪，不会导致页面布局抖动 -->
+    <Image 
+      src={heroImage} 
+      alt="科技产品背景" 
+      class="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
+      quality="high"
+    />
+    <div class="z-10 text-center bg-black/50 p-8 rounded-2xl backdrop-blur-sm">
+      <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">探索极致科技</h1>
+      <p class="text-gray-200 text-lg">全球极客的选择，立刻开启你的数字生活</p>
+    </div>
+  </section>
+
+  <!-- 产品列表 (Tailwind 栅格布局) -->
+  <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">🔥 爆款推荐</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {products.map((product) => (
+      <div class="border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow bg-white">
+        <h3 class="text-2xl font-semibold text-gray-800">{product.name}</h3>
+        <p class="text-gray-500 mt-2 min-h-[3rem]">{product.desc}</p>
+        <div class="mt-4 flex items-center justify-between">
+          <span class="text-red-500 font-bold text-xl">${product.price}</span>
+          <a 
+            href={`${base}products/${product.id}`} 
+            class="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            查看详情
+          </a>
+        </div>
       </div>
     ))}
   </div>

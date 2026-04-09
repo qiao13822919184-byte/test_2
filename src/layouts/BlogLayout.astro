@@ -1,18 +1,35 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+
 const { frontmatter } = Astro.props;
 const base = import.meta.env.BASE_URL;
----
-<BaseLayout title={frontmatter.title}>
-  <a href={`${base}/blog`} style="color: #666; text-decoration: none;">⬅ 返回博客列表</a>
-  
-  <h1 style="margin-top: 20px;">{frontmatter.title}</h1>
-  <div style="color: gray; font-size: 0.9em; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
-    作者: {frontmatter.author} | 发布日期: {frontmatter.date}
-  </div>
 
-  <article style="line-height: 1.8; color: #333;">
-    <!-- Markdown 内容注入点 -->
-    <slot />
-  </article>
+// 1. 变量定义必须留在 --- 内部
+// 如果没有写描述，截取 title 作为备选
+const desc = frontmatter.description || `${frontmatter.title} - 最新技术博客文章`;
+---
+
+<BaseLayout title={frontmatter.title} description={desc}>
+  <div class="max-w-3xl mx-auto mt-10 px-4">
+    <a href={`${base}blog`} class="text-blue-600 hover:underline mb-8 inline-block transition-colors">
+      ⬅ 返回博客列表
+    </a>
+    
+    <header class="mb-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+        {frontmatter.title}
+      </h1>
+      <div class="text-gray-500 font-medium flex items-center justify-center gap-2">
+        <time datetime={frontmatter.date}>发布日期: {frontmatter.date}</time>
+      </div>
+    </header>
+
+    <article class="prose prose-lg prose-blue mx-auto max-w-none">
+      <slot />
+    </article>
+
+    <div class="mt-20 border-t border-gray-100 pt-10 text-center text-gray-400 text-sm">
+      感谢阅读。如有疑问，欢迎通过 WhatsApp 联系我。
+    </div>
+  </div>
 </BaseLayout>
