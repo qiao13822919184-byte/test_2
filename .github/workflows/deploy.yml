@@ -17,22 +17,26 @@ jobs:
       - name: Checkout your repository
         uses: actions/checkout@v4
 
-      # 1. 强制安装正确的 Node 版本
-      - name: Setup Node.js v22
+      # 1. 强制安装 Node.js 22 (满足 Astro 6+ 的硬性要求)
+      - name: Install Node.js v22
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: 22
           cache: 'npm'
 
-      # 2. 手动安装依赖（这样可以确保环境已经切换到 v22）
+      # 2. 手动安装依赖
       - name: Install dependencies
         run: npm install
 
-      # 3. 使用 Astro 插件进行构建（关键：让它直接用我们装好的环境）
+      # 3. 手动执行构建命令
       - name: Build with Astro
-        uses: withastro/action@v2
-        # 注意：这里我们移除了 explicit 的 package-manager 声明
-        # 因为我们在上一步已经处理好了环境
+        run: npm run build
+
+      # 4. 手动上传构建后的文件 (Astro 默认产物在 dist 文件夹)
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
 
   deploy:
     needs: build
