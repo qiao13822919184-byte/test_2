@@ -6,7 +6,6 @@ import { Image } from 'astro:assets';
 // 2. 引入本地高清大图（注意：Astro 会在构建时自动处理它）
 import heroImage from '../assets/hero.jpg';
 
-const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="首页">
@@ -35,9 +34,10 @@ const base = import.meta.env.BASE_URL;
         <p class="text-gray-500 mt-2 min-h-[3rem]">{product.desc}</p>
         <div class="mt-4 flex items-center justify-between">
           <span class="text-red-500 font-bold text-xl">${product.price}</span>
+          <!-- 核心修改这里：去掉 ${base}，直接写 /products/ -->
           <a 
-            href={`${base}/products/${product.id}`} 
-            class="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            href={`/products/${product.id}`} 
+            class="bg-black text-white px-5 py-2 rounded-lg..."
           >
             查看详情
           </a>
