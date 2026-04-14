@@ -109,14 +109,26 @@ const schema = JSON.stringify({
       });
     });
 
-    // 2. WhatsApp 按钮逻辑
+    // 2. WhatsApp 按钮逻辑与 GA4 埋点
     const waBtn = document.getElementById('wa-btn');
     if(waBtn) {
       waBtn.addEventListener('click', (e) => {
         const name = e.currentTarget.getAttribute('data-name');
+        
+        // 📊 [核心新增] 向 GA4 发送自定义事件：click_whatsapp
+        // 我们会把点击的产品名称一起传给谷歌，这样你就知道哪个产品的转化率最高！
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'click_whatsapp', {
+            product_name: name,
+            action_type: 'consultation'
+          });
+        }
+
+        // 执行原有的跳转逻辑
         const text = encodeURIComponent(`你好，我想咨询关于【${name}】的详情与价格。`);
         window.open(`https://wa.me/123456789?text=${text}`);
       });
     }
   </script>
+  
 </BaseLayout>
