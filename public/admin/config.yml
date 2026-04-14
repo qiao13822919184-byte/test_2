@@ -1,0 +1,31 @@
+backend:
+  name: github
+  # 🚨 请将下面这行替换成你真实的 GitHub 用户名和仓库名！
+  # 例如：repo: "qiao13822919184-byte/你的仓库名"
+  repo: "qiao13822919184-byte/test_2" 
+  branch: main
+
+# 媒体文件（图片）的存储策略
+media_folder: "src/assets/uploads" # CMS 上传的图片保存在代码的哪里
+public_folder: "../../assets/uploads" # 博客 Markdown 代码中引用图片的相对路径
+
+# 开启本地测试功能（如果你在本地 npm run dev 时想测试后台）
+local_backend: true
+
+collections:
+  # ==========================================
+  # 1. 博客文章管理 (Folder Collection)
+  # 自动读取和写入 src/pages/blog 下的 Markdown
+  # ==========================================
+  - name: "blog"
+    label: "技术博客"
+    folder: "src/pages/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - {label: "标题", name: "title", widget: "string"}
+      - {label: "描述", name: "description", widget: "string"}
+      - {label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false}
+      - {label: "正文内容", name: "body", widget: "markdown"}
