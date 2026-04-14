@@ -6,8 +6,11 @@ backend:
   branch: main
 
 # 媒体文件（图片）的存储策略
-media_folder: "src/assets/uploads" # CMS 上传的图片保存在代码的哪里
-public_folder: "../../assets/uploads" # 博客 Markdown 代码中引用图片的相对路径
+# 媒体文件（图片）的存储策略
+# 1. 图片会实际保存在代码仓库的 public/uploads 文件夹下
+media_folder: "public/uploads" 
+# 2. Markdown 引用图片时，会生成形如 ![图](/uploads/img.png) 的绝对路径（必须以 / 开头）
+public_folder: "/uploads"
 
 # 开启本地测试功能（如果你在本地 npm run dev 时想测试后台）
 local_backend: true
