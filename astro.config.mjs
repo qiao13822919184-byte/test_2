@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 import sitemap from '@astrojs/sitemap';
 
+import react from '@astrojs/react';
+
 // export default defineConfig({
 //   // 替换为你真实的 GitHub 用户名
 //   site: 'https://qiao13822919184-byte.github.io',
@@ -29,5 +31,5 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [sitemap()]
+  integrations: [sitemap(), react()]
 });

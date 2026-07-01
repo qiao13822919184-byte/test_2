@@ -1,34 +1,230 @@
 backend:
   name: github
-  # 🚨 请将下面这行替换成你真实的 GitHub 用户名和仓库名！
-  # 例如：repo: "qiao13822919184-byte/你的仓库名"
-  repo: "qiao13822919184-byte/test_2" 
+  repo: "qiao13822919184-byte/test_2"
   branch: main
 
-# 媒体文件（图片）的存储策略
-# 媒体文件（图片）的存储策略
-# 1. 图片会实际保存在代码仓库的 public/uploads 文件夹下
-media_folder: "public/uploads" 
-# 2. Markdown 引用图片时，会生成形如 ![图](/uploads/img.png) 的绝对路径（必须以 / 开头）
+# 媒体文件（图片）存储到代码仓库 public/uploads，引用路径以 / 开头
+media_folder: "public/uploads"
 public_folder: "/uploads"
 
-# 开启本地测试功能（如果你在本地 npm run dev 时想测试后台）
+# 本地 npm run dev 时可开启本地后台联调
 local_backend: true
+
+# 后台界面语言
+locale: "zh_Hans"
 
 collections:
   # ==========================================
-  # 1. 博客文章管理 (Folder Collection)
-  # 自动读取和写入 src/pages/blog 下的 Markdown
+  # 1. 网站设置（公司信息 / 首页 / 关于我们）
   # ==========================================
-  - name: "blog"
-    label: "技术博客"
-    folder: "src/pages/blog"
+  - name: "settings"
+    label: "网站设置"
+    delete: false
+    editor:
+      preview: false
+    files:
+      # ---- 1.1 基本信息 / 联系方式 ----
+      - name: "site"
+        label: "基本信息与联系方式"
+        file: "src/data/site.json"
+        fields:
+          - { label: "品牌英文名", name: "brand", widget: "string" }
+          - { label: "公司全称", name: "companyName", widget: "string" }
+          - { label: "公司简称", name: "companyShort", widget: "string" }
+          - { label: "标语", name: "tagline", widget: "string" }
+          - { label: "Slogan", name: "slogan", widget: "string" }
+          - { label: "公司简介", name: "description", widget: "text" }
+          - { label: "网站网址", name: "siteUrl", widget: "string" }
+          - { label: "Logo 文字", name: "logoText", widget: "string" }
+          - { label: "成立年份", name: "foundedYear", widget: "string" }
+          - label: "联系方式"
+            name: "contact"
+            widget: "object"
+            fields:
+              - { label: "WhatsApp 号码（纯数字，含国家码）", name: "whatsappDigits", widget: "string", hint: "例如 8613822919184，不要加 + 或空格" }
+              - { label: "WhatsApp 显示文本", name: "whatsappDisplay", widget: "string" }
+              - { label: "邮箱", name: "email", widget: "string" }
+              - { label: "电话显示", name: "phoneDisplay", widget: "string" }
+              - { label: "微信", name: "wechat", widget: "string", required: false }
+              - { label: "地址（简）", name: "addressLine", widget: "string" }
+              - { label: "地址（全）", name: "addressFull", widget: "string" }
+              - { label: "营业时间", name: "businessHours", widget: "string" }
+          - label: "数据亮点（首页/关于页展示）"
+            name: "highlights"
+            widget: "list"
+            fields:
+              - { label: "数值", name: "value", widget: "string" }
+              - { label: "说明", name: "label", widget: "string" }
+          - label: "统计代码"
+            name: "analytics"
+            widget: "object"
+            fields:
+              - { label: "GA4 衡量 ID", name: "ga4Id", widget: "string" }
+          - label: "SEO 默认值"
+            name: "seo"
+            widget: "object"
+            fields:
+              - { label: "默认标题", name: "defaultTitle", widget: "string" }
+              - { label: "默认描述", name: "defaultDescription", widget: "text" }
+              - { label: "默认分享图（社交分享缩略图）", name: "ogImage", widget: "string", hint: "微信/Facebook 等分享时显示，必须填完整 https 网址，不能用 /uploads 相对路径" }
+
+      # ---- 1.2 首页内容 ----
+      - name: "home"
+        label: "首页内容"
+        file: "src/data/home.json"
+        fields:
+          - label: "首屏 Hero"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "小标签", name: "eyebrow", widget: "string" }
+              - { label: "主标题", name: "title", widget: "string" }
+              - { label: "副标题", name: "subtitle", widget: "text" }
+              - { label: "主按钮文字", name: "primaryCta", widget: "string" }
+              - { label: "次按钮文字", name: "secondaryCta", widget: "string" }
+          - label: "核心优势（4 项）"
+            name: "valueProps"
+            widget: "list"
+            fields:
+              - { label: "图标", name: "icon", widget: "select", options: ["factory", "shield", "pencil", "globe"] }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "描述", name: "desc", widget: "text" }
+          - label: "为什么选择我们"
+            name: "whyUs"
+            widget: "object"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "副标题", name: "subtitle", widget: "string" }
+              - { label: "要点", name: "points", widget: "list", field: { label: "要点", name: "point", widget: "string" } }
+              - { label: "配图", name: "image", widget: "image" }
+          - label: "合作流程（4 步）"
+            name: "process"
+            widget: "list"
+            fields:
+              - { label: "步骤号", name: "step", widget: "string" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "描述", name: "desc", widget: "text" }
+          - label: "常见问题 FAQ"
+            name: "faq"
+            widget: "list"
+            fields:
+              - { label: "问题", name: "q", widget: "string" }
+              - { label: "回答", name: "a", widget: "text" }
+          - label: "底部号召区"
+            name: "ctaBand"
+            widget: "object"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "副标题", name: "subtitle", widget: "text" }
+              - { label: "按钮文字", name: "button", widget: "string" }
+
+      # ---- 1.3 关于我们 ----
+      - name: "about"
+        label: "关于我们"
+        file: "src/data/about.json"
+        fields:
+          - label: "首屏"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "小标签", name: "eyebrow", widget: "string" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "副标题", name: "subtitle", widget: "text" }
+          - label: "公司故事"
+            name: "story"
+            widget: "object"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "段落", name: "paragraphs", widget: "list", field: { label: "段落", name: "p", widget: "text" } }
+              - { label: "配图", name: "image", widget: "image" }
+          - label: "工厂能力"
+            name: "capabilities"
+            widget: "list"
+            fields:
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "描述", name: "desc", widget: "text" }
+          - label: "数据统计"
+            name: "stats"
+            widget: "list"
+            fields:
+              - { label: "数值", name: "value", widget: "string" }
+              - { label: "说明", name: "label", widget: "string" }
+
+      # ---- 1.4 产品分类（首页「产品系列」+ 产品页筛选共用） ----
+      - name: "categories"
+        label: "产品分类"
+        file: "src/data/categories.json"
+        fields:
+          - label: "分类列表"
+            name: "categories"
+            label_singular: "分类"
+            widget: "list"
+            fields:
+              - { label: "标识 slug（关联产品，请勿随意修改）", name: "slug", widget: "string", hint: "与产品的「分类」一一对应，如 flatware-sets；修改会导致已有产品归类错乱" }
+              - { label: "中文名称", name: "name", widget: "string" }
+              - { label: "英文名称", name: "nameEn", widget: "string", required: false }
+              - { label: "简介（首页系列卡 + 列表展示）", name: "summary", widget: "text" }
+              - { label: "配图（首页「产品系列」展示）", name: "image", widget: "image" }
+
+  # ==========================================
+  # 2. 产品管理（每个产品一个文件，可上传图片）
+  # ==========================================
+  - name: "products"
+    label: "产品"
+    label_singular: "产品"
+    folder: "src/content/products"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     extension: "md"
     format: "frontmatter"
+    slug: "{{slug}}"
+    summary: "{{title}}"
     fields:
-      - {label: "标题", name: "title", widget: "string"}
-      - {label: "描述", name: "description", widget: "string"}
-      - {label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false}
-      - {label: "正文内容", name: "body", widget: "markdown"}
+      - { label: "产品名称", name: "title", widget: "string" }
+      - label: "分类"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "不锈钢餐具套装", value: "flatware-sets" }
+          - { label: "刀叉勺单品", value: "cutlery" }
+          - { label: "不锈钢厨房用具", value: "kitchenware" }
+          - { label: "不锈钢餐桌用品", value: "tableware" }
+      - { label: "简介（列表/分享展示）", name: "summary", widget: "text" }
+      - label: "产品图片（第一张为主图）"
+        name: "images"
+        widget: "list"
+        field: { label: "图片", name: "image", widget: "image" }
+      - { label: "材质", name: "material", widget: "string", required: false }
+      - { label: "表面工艺", name: "finish", widget: "string", required: false }
+      - { label: "起订量 MOQ", name: "moq", widget: "string", required: false }
+      - { label: "交期", name: "leadTime", widget: "string", required: false }
+      - label: "额外规格行（可选）"
+        name: "specs"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "名称", name: "label", widget: "string" }
+          - { label: "数值", name: "value", widget: "string" }
+      - { label: "设为精选（首页展示）", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "排序（数字越小越靠前）", name: "order", widget: "number", default: 99, value_type: "int", required: false }
+      - { label: "详细介绍", name: "body", widget: "markdown" }
+
+  # ==========================================
+  # 3. 博客管理（每篇文章一个文件）
+  # ==========================================
+  - name: "blog"
+    label: "博客"
+    label_singular: "文章"
+    folder: "src/content/blog"
+    create: true
+    extension: "md"
+    format: "frontmatter"
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "描述（SEO/列表摘要）", name: "description", widget: "string", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "作者", name: "author", widget: "string", default: "Yumingxing", required: false }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - { label: "标签", name: "tags", widget: "list", required: false, field: { label: "标签", name: "tag", widget: "string" } }
+      - { label: "正文内容", name: "body", widget: "markdown" }

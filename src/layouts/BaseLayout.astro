@@ -2,33 +2,110 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-// 引入 SEO 组件
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import SEO from '../components/SEO.astro';
+import site from '../data/site.json';
 
-// 接收 description 并在 SEO 组件中透传
-const { title, description } = Astro.props;
+const { title, description, image, noindex = false } = Astro.props;
+const gaId = site.analytics.ga4Id;
+
+// 全站组织结构化数据（GEO / 知识图谱友好）
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.companyName,
+  alternateName: site.brand,
+  url: site.siteUrl,
+  description: site.description,
+  foundingDate: site.foundedYear,
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'CN',
+    addressRegion: '广东省',
+    addressLocality: '揭阳市榕城区',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'sales',
+    email: site.contact.email,
+    telephone: site.contact.phoneDisplay,
+    availableLanguage: ['zh-CN', 'en'],
+  },
+};
 ---
-<html lang="zh">
+<!doctype html>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 注入魔法 -->
-    <SEO title={title} description={description} />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XDRRT64432" is:inline></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer ||[];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
 
-      // 这里也要换成你的 G-ID
-      gtag('config', 'G-XDRRT64432');
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
+
+    <SEO title={title} description={description} image={image} noindex={noindex} />
+
+    <!-- Organization 结构化数据 -->
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+
+    <!-- 页面级 head 注入（Product / Article JSON-LD 等） -->
+    <slot name="head" />
+
+    <!-- Google Analytics 4 -->
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} is:inline></script>
+    <script is:inline define:vars={{ gaId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', gaId);
     </script>
   </head>
-  <body class="bg-white text-gray-900 font-sans antialiased flex flex-col min-h-screen">
+  <body class="flex flex-col min-h-screen">
     <Header />
-    <main class="flex-grow w-full max-w-6xl mx-auto px-4 py-8">
+    <main class="flex-grow w-full">
       <slot />
     </main>
     <Footer />
+    <WhatsAppFloat />
+
+    <!-- WhatsApp 点击转化埋点：任何带 data-wa 的元素被点击都会上报 GA4 -->
+    <script is:inline>
+      document.addEventListener('click', function (e) {
+        const t = e.target.closest('[data-wa]');
+        if (!t) return;
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'click_whatsapp', {
+            product_name: t.getAttribute('data-wa-product') || 'general',
+            action_type: 'consultation',
+          });
+        }
+      });
+    </script>
+
+    <!-- 滚动渐入：为带 .reveal 的元素在进入视口时添加 .is-visible（纯增强，可降级） -->
+    <script is:inline>
+      (function () {
+        var nodes = document.querySelectorAll('.reveal');
+        if (!nodes.length) return;
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !('IntersectionObserver' in window)) {
+          nodes.forEach(function (n) { n.classList.add('is-visible'); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+        nodes.forEach(function (n) { io.observe(n); });
+      })();
+    </script>
   </body>
 </html>

@@ -1,60 +1,98 @@
 ---
-// src/pages/products/index.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import products from '../../data/products.json';
+import ProductCard from '../../components/ProductCard.astro';
+import { getCollection } from 'astro:content';
+import categoriesData from '../../data/categories.json';
+const categories = categoriesData.categories;
+import site from '../../data/site.json';
 
-const title = "产品目录";
-const description = "浏览我们的全线产品列表。";
+const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+
+const waText = encodeURIComponent('您好，我想批量采购裕明兴的不锈钢餐具，请提供报价。');
+const waLink = `https://wa.me/${site.contact.whatsappDigits}?text=${waText}`;
 ---
-
-<BaseLayout title={title} description={description}>
-  <div class="max-w-4xl mx-auto">
-    <div class="mb-8 border-b border-gray-100 pb-6">
-      <h1 class="text-3xl font-bold text-gray-900">产品目录</h1>
-      <p class="text-gray-500 mt-2">精选优质硬件，助力你的数字生活。</p>
+<BaseLayout
+  title="产品中心"
+  description="裕明兴不锈钢餐具与厨具产品中心：餐具套装、刀叉勺单品、厨房用具与餐桌用品，支持 OEM/ODM 定制与批量出口。"
+>
+  <!-- Page header -->
+  <section class="brand-hero text-white relative overflow-hidden border-b border-line">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-20 md:pt-20 md:pb-24 relative z-10">
+      <nav class="text-sm text-white/60 mb-5">
+        <a href="/" class="hover:text-white transition-colors">首页</a> <span class="mx-1">/</span> <span class="text-white/90">产品中心</span>
+      </nav>
+      <p class="eyebrow eyebrow-amber mb-4">产品中心</p>
+      <h1 class="steel-text font-display font-extrabold text-4xl md:text-5xl">覆盖全场景的不锈钢制品</h1>
+      <p class="text-white/75 mt-5 max-w-2xl leading-relaxed">
+        精选不锈钢餐具与厨具，采用 304 / 18-10 食品级材质，支持 OEM/ODM 定制与批量出口。点击任一产品即可 WhatsApp 询价。
+      </p>
     </div>
+  </section>
 
-    <div class="flex flex-col gap-4">
-      {products.map((product) => (
-        <a 
-          href={`/products/${product.id}`} 
-          class="group flex items-center bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300"
-        >
-          {product.images && product.images.length > 0 && (
-            <div class="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 overflow-hidden bg-gray-50">
-              <img 
-                src={product.images[0]} 
-                alt={product.name} 
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-              />
-            </div>
-          )}
-          
-          <div class="flex flex-col justify-between flex-grow p-4 sm:p-6 overflow-hidden">
-            <div>
-              <div class="flex justify-between items-start mb-1">
-                <h3 class="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                  {product.name}
-                </h3>
-                <span class="text-blue-600 font-bold text-lg ml-4">${product.price}</span>
-              </div>
-              
-              <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-2">
-                {product.desc}
-              </p>
-            </div>
-
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded uppercase tracking-wider font-semibold">
-                库存充足
-              </span>
-              <span class="text-sm text-blue-500 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                详情 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-              </span>
-            </div>
-          </div>
-        </a>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <!-- Filter pills -->
+    <div class="reveal flex flex-wrap gap-2.5 mb-8">
+      <button class="pill" data-filter="all">全部</button>
+      {categories.map((c) => (
+        <button class="pill" data-filter={c.slug}>{c.name}</button>
       ))}
     </div>
-  </div>
+
+    <!-- Grid -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" id="product-grid">
+      {products.map((product) => (
+        <div class="product-item" data-cat={product.data.category}>
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+
+    <p id="empty-state" class="hidden text-center text-ink-muted py-16">该分类暂无产品，欢迎 WhatsApp 咨询定制。</p>
+
+    <!-- Inline quote CTA -->
+    <div class="reveal glass-light card-hover mt-12 rounded-2xl p-8 sm:p-10 text-center">
+      <p class="eyebrow eyebrow-center justify-center mb-3">来图来样</p>
+      <h2 class="font-display font-bold text-2xl text-ink">没有找到合适的款式？</h2>
+      <p class="text-ink-muted mt-2">我们支持来图来样定制，告诉我们你的需求即可获取报价。</p>
+      <a href={waLink} target="_blank" rel="noopener" data-wa data-wa-product="products_cta" class="btn btn-primary mt-6 px-7 py-3.5">WhatsApp 定制咨询</a>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const pills = Array.from(document.querySelectorAll('[data-filter]'));
+      const items = Array.from(document.querySelectorAll('.product-item'));
+      const empty = document.getElementById('empty-state');
+
+      function apply(cat, forceReveal) {
+        let visible = 0;
+        items.forEach((it) => {
+          const show = cat === 'all' || it.dataset.cat === cat;
+          it.style.display = show ? '' : 'none';
+          if (show) {
+            visible++;
+            // 用户筛选后，确保被显示出来的卡片不会停留在 .reveal 的初始隐藏态
+            if (forceReveal) {
+              const r = it.querySelector('.reveal');
+              if (r) r.classList.add('is-visible');
+            }
+          }
+        });
+        pills.forEach((p) => p.classList.toggle('pill-active', p.dataset.filter === cat));
+        if (empty) empty.classList.toggle('hidden', visible !== 0);
+      }
+
+      pills.forEach((p) => {
+        p.addEventListener('click', function () {
+          const cat = p.dataset.filter;
+          history.replaceState(null, '', cat === 'all' ? location.pathname : '?cat=' + cat);
+          apply(cat, true);
+        });
+      });
+
+      // 初次加载交给 IntersectionObserver 做渐入；筛选点击时强制显形
+      apply(params.get('cat') || 'all', false);
+    })();
+  </script>
 </BaseLayout>

@@ -1,134 +1,170 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import products from '../../data/products.json';
+import ProductCard from '../../components/ProductCard.astro';
+import { getCollection, render } from 'astro:content';
+import categoriesData from '../../data/categories.json';
+const categories = categoriesData.categories;
+import site from '../../data/site.json';
 
 export async function getStaticPaths() {
-  return products.map((product) => ({
-    params: { id: product.id },
-    props: { product },
+  const products = await getCollection('products');
+  return products.map((p) => ({
+    params: { id: p.id },
+    props: {
+      product: p,
+      related: products
+        .filter((x) => x.id !== p.id && x.data.category === p.data.category)
+        .slice(0, 3),
+    },
   }));
 }
 
-const { product } = Astro.props;
-// 生成针对该产品的 JSON-LD 结构化数据
-const schema = JSON.stringify({
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": product.name,
-  "image": product.images[0],
-  "description": product.desc,
-  "offers": {
-    "@type": "Offer",
-    "url": Astro.url.href,
-    "priceCurrency": "USD",
-    "price": product.price,
-    "itemCondition": "https://schema.org/NewCondition",
-    "availability": "https://schema.org/InStock"
-  }
-});
+const { product, related } = Astro.props;
+const d = product.data;
+const { Content } = await render(product);
+
+const cat = categories.find((c) => c.slug === d.category);
+const images = d.images && d.images.length ? d.images : [];
+const mainImg = images[0] || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=1200&auto=format&fit=crop';
+
+// 规格表行
+const specRows = [
+  d.material && { label: '材质', value: d.material },
+  d.finish && { label: '工艺', value: d.finish },
+  d.moq && { label: '起订量 (MOQ)', value: d.moq },
+  d.leadTime && { label: '交期', value: d.leadTime },
+  cat && { label: '分类', value: cat.name },
+  ...(d.specs || []),
+].filter(Boolean);
+
+const waText = encodeURIComponent(`您好，我想咨询【${d.title}】的报价与详情。`);
+const waLink = `https://wa.me/${site.contact.whatsappDigits}?text=${waText}`;
+const emailLink = `mailto:${site.contact.email}?subject=${encodeURIComponent('产品询价：' + d.title)}`;
+
+// 结构化数据
+const productSchema = {
+  '@context': 'https://schema.org/',
+  '@type': 'Product',
+  name: d.title,
+  image: images.length ? images : [mainImg],
+  description: d.summary,
+  category: cat ? cat.name : undefined,
+  brand: { '@type': 'Brand', name: site.brand },
+  manufacturer: { '@type': 'Organization', name: site.companyName },
+  material: d.material,
+};
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: new URL('/', Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: '产品中心', item: new URL('/products', Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: d.title, item: Astro.url.href },
+  ],
+};
 ---
-<!-- 将 desc 传给 BaseLayout -->
-<BaseLayout title={product.name} description={product.desc}>
-  
-  <!-- 把结构化数据隐藏注入到页面中 (给爬虫看的) -->
-  <script type="application/ld+json" set:html={schema}></script>
+<BaseLayout title={d.title} description={d.summary} image={mainImg}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(productSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(breadcrumbSchema)} />
 
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-ink-muted mb-8">
+      <a href="/" class="hover:text-ocean">首页</a> <span class="mx-1">/</span>
+      <a href="/products" class="hover:text-ocean">产品中心</a> <span class="mx-1">/</span>
+      <span class="text-ink">{d.title}</span>
+    </nav>
 
-<BaseLayout title={product.name}>
-  <!-- 面包屑导航 -->
-  <nav class="text-sm text-gray-500 mb-8">
-    <a href="/" class="hover:text-black">首页</a> > 
-    <span class="text-gray-900">{product.name}</span>
-  </nav>
-
-  <!-- 产品核心布局：左侧图库，右侧信息 -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-    
-    <!-- 左侧：图片画廊 -->
-    <div class="space-y-4">
-      <!-- 主图 -->
-      <div class="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
-        <img 
-          id="main-image" 
-          src={product.images[0]} 
-          alt={product.name} 
-          class="w-full h-full object-cover transition-opacity duration-300"
-        />
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-14">
+      <!-- Gallery -->
+      <div class="reveal">
+        <div class="sheen group aspect-square rounded-3xl overflow-hidden bg-sand border border-line">
+          <img id="main-image" src={mainImg} alt={d.title} class="w-full h-full object-cover transition-opacity duration-300" />
+        </div>
+        {images.length > 1 && (
+          <div class="flex gap-3 mt-4">
+            {images.map((img) => (
+              <button class="thumb-btn w-20 h-20 rounded-xl overflow-hidden border-2 border-transparent focus:border-ocean hover:opacity-80 transition" data-image={img}>
+                <img src={img} alt="" class="w-full h-full object-cover pointer-events-none" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <!-- 缩略图列表 -->
-      <div class="flex gap-4">
-        {product.images.map((img, index) => (
-          <button class="thumb-btn w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent focus:border-blue-600 hover:opacity-80 transition-all" data-image={img}>
-            <img src={img} class="w-full h-full object-cover pointer-events-none" />
-          </button>
-        ))}
+
+      <!-- Info -->
+      <div class="reveal reveal-d1 flex flex-col">
+        {cat && <span class="eyebrow">{cat.name}</span>}
+        <h1 class="font-display font-extrabold text-3xl md:text-4xl text-ink mt-2 leading-tight">{d.title}</h1>
+        <p class="text-ink-muted mt-4 text-lg leading-relaxed">{d.summary}</p>
+
+        <!-- Spec table -->
+        {specRows.length > 0 && (
+          <dl class="mt-7 rounded-2xl border border-line overflow-hidden divide-y divide-line shadow-[var(--shadow-soft)]">
+            {specRows.map((row) => (
+              <div class="flex bg-white transition-colors duration-200 hover:bg-steel-50/50">
+                <dt class="w-32 sm:w-40 shrink-0 bg-sand/60 px-4 py-3 text-sm font-semibold text-ink-soft">{row.label}</dt>
+                <dd class="px-4 py-3 text-sm text-ink">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <!-- Quote CTA -->
+        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+          <a href={waLink} target="_blank" rel="noopener" data-wa data-wa-product={d.title} class="btn btn-primary flex-1 py-4 text-base">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            WhatsApp 获取报价
+          </a>
+          <a href={emailLink} class="btn btn-ghost flex-1 py-4 text-base">邮件询价</a>
+        </div>
+        <p class="text-sm text-ink-muted mt-4">支持 OEM/ODM 定制 · 来图来样 · 批量出口 · {site.contact.businessHours}</p>
       </div>
     </div>
 
-    <!-- 右侧：产品信息 & 购买 -->
-    <div class="flex flex-col justify-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">{product.name}</h1>
-      <p class="text-3xl font-light text-gray-900 mt-6">${product.price}</p>
-      
-      <div class="w-full h-[1px] bg-gray-200 my-8"></div>
-      
-      <p class="text-gray-600 leading-relaxed text-lg mb-8">
-        {product.desc}
-      </p>
-
-      <!-- 核心 CTA 按钮 -->
-      <button 
-        id="wa-btn" 
-        data-name={product.name}
-        class="w-full md:w-auto flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebd57] text-white px-8 py-4 rounded-xl text-lg font-bold transition-transform hover:-translate-y-1 shadow-lg shadow-green-500/30"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.88-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.52-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-        WhatsApp 咨询
-      </button>
-      <p class="text-sm text-gray-400 mt-4 text-center md:text-left">🔒 安全交易 · 全球配送 · 7x24小时客服</p>
+    <!-- Rich description -->
+    <div class="reveal mt-16 grid lg:grid-cols-[1fr_320px] gap-12">
+      <article class="prose prose-lg max-w-none">
+        <h2>产品介绍</h2>
+        <Content />
+      </article>
+      <aside class="reveal reveal-d1 lg:sticky lg:top-24 self-start">
+        <div class="brand-hero text-white rounded-2xl p-6">
+          <h3 class="font-display font-bold text-lg">需要批量报价？</h3>
+          <p class="text-white/75 text-sm mt-2 leading-relaxed">告诉我们数量与定制需求，一个工作日内回复。</p>
+          <a href={waLink} target="_blank" rel="noopener" data-wa data-wa-product={`aside_${d.title}`} class="btn btn-primary w-full mt-5 py-3">立即询价</a>
+          <div class="mt-4 pt-4 border-t border-white/15 text-sm text-white/70 space-y-1.5">
+            <p>✉ {site.contact.email}</p>
+            <p> {site.contact.whatsappDisplay}</p>
+          </div>
+        </div>
+      </aside>
     </div>
+
+    <!-- Related -->
+    {related.length > 0 && (
+      <div class="reveal mt-20">
+        <p class="eyebrow">同系列推荐</p>
+        <h2 class="font-display font-extrabold text-2xl md:text-3xl text-ink mt-2 mb-6">相关产品</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {related.map((p) => <ProductCard product={p} />)}
+        </div>
+      </div>
+    )}
   </div>
 
-  <!-- 原生 JS：实现轻量级图片切换和 WA 按钮 -->
-  <script>
-    // 1. 图片画廊切换逻辑
-    const mainImage = document.getElementById('main-image');
-    const thumbBtns = document.querySelectorAll('.thumb-btn');
-
-    thumbBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        // 获取按钮上绑定的 data-image 属性
-        const newSrc = e.currentTarget.getAttribute('data-image');
-        if (mainImage && newSrc) {
-          mainImage.style.opacity = '0'; // 加上一点简单的淡入淡出动画
-          setTimeout(() => {
-            mainImage.src = newSrc;
-            mainImage.style.opacity = '1';
-          }, 150);
-        }
+  <script is:inline>
+    (function () {
+      const main = document.getElementById('main-image');
+      document.querySelectorAll('.thumb-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const src = btn.getAttribute('data-image');
+          if (main && src) {
+            main.style.opacity = '0';
+            setTimeout(function () { main.src = src; main.style.opacity = '1'; }, 150);
+          }
+        });
       });
-    });
-
-    // 2. WhatsApp 按钮逻辑与 GA4 埋点
-    const waBtn = document.getElementById('wa-btn');
-    if(waBtn) {
-      waBtn.addEventListener('click', (e) => {
-        const name = e.currentTarget.getAttribute('data-name');
-        
-        // 📊 [核心新增] 向 GA4 发送自定义事件：click_whatsapp
-        // 我们会把点击的产品名称一起传给谷歌，这样你就知道哪个产品的转化率最高！
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'click_whatsapp', {
-            product_name: name,
-            action_type: 'consultation'
-          });
-        }
-
-        // 执行原有的跳转逻辑
-        const text = encodeURIComponent(`你好，我想咨询关于【${name}】的详情与价格。`);
-        window.open(`https://wa.me/123456789?text=${text}`);
-      });
-    }
+    })();
   </script>
-  
 </BaseLayout>

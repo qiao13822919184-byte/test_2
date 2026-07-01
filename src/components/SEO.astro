@@ -1,28 +1,34 @@
 ---
-const { 
-  title, 
-  description = "ACME Tech - 探索极致科技，全球极客的选择。", 
-  image = "/default-og.png", // 你可以在 public 目录下放一张默认的分享图
+import site from '../data/site.json';
+
+const {
+  title,
+  description = site.seo.defaultDescription,
+  image = site.seo.ogImage,
+  noindex = false,
 } = Astro.props;
 
-// 生成当前页面的规范链接 (Canonical URL)，防止谷歌因为参数不同认为你有重复内容
+// 页面标题统一加上品牌后缀；首页等可不传 title 走默认大标题
+const fullTitle = title ? `${title} | ${site.brand} 裕明兴` : site.seo.defaultTitle;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url);
+const ogImageURL = new URL(image, Astro.site || Astro.url);
 ---
-
-<!-- 基础 TDK -->
-<title>{title} | ACME 独立站</title>
+<title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
 
-<!-- Open Graph / Facebook (社交媒体分享卡片) -->
+<!-- Open Graph -->
 <meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.companyName} />
 <meta property="og:url" content={canonicalURL} />
-<meta property="og:title" content={title} />
+<meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.site || Astro.url)} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:locale" content="zh_CN" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
+<meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={new URL(image, Astro.site || Astro.url)} />
+<meta name="twitter:image" content={ogImageURL} />

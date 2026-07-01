@@ -1,3 +1,628 @@
 @import "tailwindcss";
-
 @plugin "@tailwindcss/typography";
+
+/* =========================================================
+   裕明兴 · 设计令牌 (Design Tokens)
+   「钢艺工坊」基调：深色英雄区流光玻璃 + 浅暖正文
+   色系取自首页参考图：深海蓝 → 钢青 → 暖砂 → 琥珀 → 橙 → 火焰红
+   冷色 = 不锈钢/洁净；暖色 = 厨房/食材/热情
+   ========================================================= */
+@theme {
+  /* 主色：深海墨蓝（标题/正文/信任感） */
+  --color-ink: #0b1e33;
+  --color-ink-soft: #1b3650;
+  --color-ink-muted: #5b6b7c;
+
+  /* 更深的「工坊」近黑底（深色区基底） */
+  --color-abyss: #061320;
+
+  /* 钢青/海蓝（链接、强调、金属质感） */
+  --color-ocean: #135e96;
+  --color-steel: #2e8fa8;
+  --color-steel-light: #6fb7c7;
+  --color-steel-50: #eef6f8;
+
+  /* 暖中性（页面背景，避免冷白） */
+  --color-cream: #fbf7ef;
+  --color-sand: #f6efe1;
+  --color-sand-deep: #ece0c8;
+  --color-line: #e7ddc9;
+
+  /* 暖强调 / CTA（琥珀 → 橙 → 火焰红） */
+  --color-amber: #f4a93c;
+  --color-orange: #f2731c;
+  --color-ember: #e0461a;
+
+  /* 字体 */
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  /* 优雅衬线（用于大字段落标题，编辑感） */
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", ui-serif, Georgia, serif;
+
+  /* 圆角 / 阴影 */
+  --radius-xl2: 1.25rem;
+  --shadow-soft: 0 18px 50px -24px rgba(11, 30, 51, 0.35);
+}
+
+/* ---------------------------------------------------------
+   基础排版
+   --------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(46, 143, 168, 0.22);
+}
+
+/* ---------------------------------------------------------
+   品牌渐变工具类（取自参考图）
+   --------------------------------------------------------- */
+.brand-gradient {
+  background-image: linear-gradient(
+    115deg,
+    #0b1e33 0%,
+    #135e96 22%,
+    #2e8fa8 40%,
+    #efe3c9 56%,
+    #f4a93c 72%,
+    #f2731c 86%,
+    #e0461a 100%
+  );
+}
+
+/* =========================================================
+   深色英雄区 / 工坊流光面 (.brand-hero)
+   全站所有深色节点共用 —— 在此集中升级即可统一全站气质：
+   · 近黑墨蓝基底 + 极缓「呼吸」流光网格（钢青冷 + 琥珀暖）
+   · 细腻噪点（金属磨砂质感） + 极淡线框网格（呼应 shader wireframe）
+   文本始终保持高对比，流光层位于内容之下 (z-index:-1)。
+   ========================================================= */
+.brand-hero {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #0a141c;
+  /* 材质层（静态）：接地暗角 + 细噪点film grain + 横向拉丝钢纹(主) + 极淡竖向板缝 + 石墨基底 */
+  background-image:
+    linear-gradient(to bottom, transparent 70%, rgba(3, 8, 12, 0.5) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 2.5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 132px),
+    linear-gradient(152deg, #0d1a24 0%, #0a141c 46%, #0b161f 100%);
+}
+
+/* 光层：缓慢「呼吸」的两枚高光池 —— 冷钢青(左上) + 暖琥珀(右上)，定位于标题/光环之后 */
+.brand-hero::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(42% 48% at 22% 4%, rgba(126, 200, 218, 0.42), transparent 60%),
+    radial-gradient(40% 46% at 86% 0%, rgba(245, 150, 66, 0.34), transparent 60%),
+    radial-gradient(46% 50% at 72% 96%, rgba(224, 70, 26, 0.16), transparent 62%),
+    radial-gradient(54% 58% at 2% 88%, rgba(19, 94, 150, 0.22), transparent 64%);
+  animation: meshDrift 24s ease-in-out infinite;
+}
+
+/* 抛光高光层：一道极缓的斜向光，如光线扫过钢面（带停顿，偶发一闪而非持续） */
+.brand-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    104deg,
+    transparent 41%,
+    rgba(173, 216, 230, 0.06) 47%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(173, 216, 230, 0.06) 53%,
+    transparent 59%
+  );
+  background-size: 250% 100%;
+  background-position: 135% 0;
+  animation: steelSweep 8.5s ease-in-out infinite;
+}
+
+@keyframes meshDrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(2.2%, -1.6%, 0) scale(1.07); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes steelSweep {
+  0%, 10%   { background-position: 135% 0; }
+  90%, 100% { background-position: -45% 0; }
+}
+
+.brand-gradient-text {
+  background-image: linear-gradient(100deg, #f4a93c 0%, #f2731c 45%, #e0461a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 拉丝钢字面：标题如一块抛光不锈钢（顶部高光 → 底部钢灰），深色底上保持高可读 */
+.steel-text {
+  background-image: linear-gradient(177deg, #ffffff 0%, #eef4f5 34%, #cfdee4 64%, #aac1ca 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 缓慢流光标题文字（克制使用：仅个别强调字/数字） */
+.gradient-text-anim {
+  background-image: linear-gradient(100deg, #ffffff 0%, #6fb7c7 32%, #f4a93c 64%, #ffffff 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: textShimmer 9s linear infinite;
+}
+@keyframes textShimmer {
+  to { background-position: 220% center; }
+}
+
+/* 细钢线分隔（顶部彩条/段落分隔） */
+.brand-rule {
+  height: 3px;
+  border: 0;
+  background-image: linear-gradient(
+    90deg,
+    #135e96 0%,
+    #2e8fa8 30%,
+    #f4a93c 62%,
+    #f2731c 82%,
+    #e0461a 100%
+  );
+}
+
+/* 发丝级钢线（精密工艺母题），用于分隔/装饰 */
+.steel-rule {
+  height: 1px;
+  border: 0;
+  background-image: linear-gradient(90deg, transparent, var(--color-line), transparent);
+}
+.steel-rule-dark {
+  height: 1px;
+  border: 0;
+  background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+}
+
+/* =========================================================
+   玻璃拟态 (glassmorphism)
+   ========================================================= */
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035));
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 24px 60px -34px rgba(0, 0, 0, 0.6);
+}
+.glass-light {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    var(--shadow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* =========================================================
+   小标题 eyebrow（前置发丝钢线 = 精密母题）
+   ========================================================= */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-steel);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-steel), transparent);
+}
+.eyebrow-amber {
+  color: var(--color-amber);
+}
+.eyebrow-amber::before {
+  background: linear-gradient(90deg, var(--color-amber), transparent);
+}
+.eyebrow-center {
+  justify-content: center;
+}
+.eyebrow-center::before {
+  display: none;
+}
+
+/* =========================================================
+   通用按钮
+   ========================================================= */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.btn-primary {
+  color: #fff;
+  background-image: linear-gradient(100deg, #f2731c, #e0461a);
+  box-shadow: 0 14px 30px -12px rgba(224, 70, 26, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -14px rgba(224, 70, 26, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.btn-ghost {
+  color: var(--color-ink);
+  background-color: #fff;
+  border: 1px solid var(--color-line);
+}
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-steel);
+  color: var(--color-ocean);
+}
+/* 深色区的玻璃描边按钮（呼应参考图 ghost 按钮） */
+.btn-outline {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.btn-outline:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-steel-light);
+  color: #eaf6f9;
+}
+
+/* 按钮微光扫过（仅 .btn-primary，克制） */
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.btn-primary:hover::after {
+  left: 130%;
+}
+
+/* 顶部导航链接：钢青→琥珀发丝下划线，悬停/选中时展开 */
+.nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-steel), var(--color-amber));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link-active::after {
+  transform: scaleX(1);
+}
+
+/* 分类筛选 pill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-soft);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pill:hover {
+  border-color: var(--color-steel);
+  color: var(--color-ocean);
+  transform: translateY(-1px);
+}
+.pill-active {
+  background-image: linear-gradient(100deg, #135e96, #2e8fa8);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 24px -14px rgba(19, 94, 150, 0.7);
+}
+
+/* =========================================================
+   卡片：统一的悬停手感（上浮 + 钢青描边 + 柔光）
+   ========================================================= */
+.card-hover {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--color-steel-light);
+}
+
+/* 镜面光泽扫过（套在 overflow-hidden 的图片容器上，悬停时如抛光反光） */
+.sheen {
+  position: relative;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.38) 50%, transparent 65%);
+  background-size: 220% 100%;
+  background-position: 150% 0;
+  transition: background-position 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+.group:hover .sheen::after {
+  background-position: -50% 0;
+}
+
+/* =========================================================
+   脉冲光环（呼应 PulsingBorder，极克制；用于英雄区点缀）
+   ========================================================= */
+.accent-ring {
+  position: relative;
+  border-radius: 9999px;
+  isolation: isolate;
+}
+.accent-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, transparent 0deg, var(--color-steel-light) 90deg, var(--color-amber) 190deg, var(--color-ember) 250deg, transparent 320deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  animation: ringSpin 14s linear infinite;
+  opacity: 0.85;
+  z-index: -1;
+}
+.accent-ring::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgba(111, 183, 199, 0.30), transparent 75%);
+  animation: ringPulse 4.5s ease-in-out infinite;
+  z-index: -2;
+}
+@keyframes ringSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.96); }
+  50% { opacity: 0.9; transform: scale(1.06); }
+}
+
+/* 环绕旋转文字（SVG textPath；呼应参考图右下角） */
+.spin-slow {
+  animation: ringSpin 22s linear infinite;
+  transform-origin: center;
+}
+
+/* =========================================================
+   滚动渐入 (scroll reveal) —— 由 BaseLayout 的 IntersectionObserver 驱动
+   ========================================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-d1 { --reveal-delay: 80ms; }
+.reveal-d2 { --reveal-delay: 160ms; }
+.reveal-d3 { --reveal-delay: 240ms; }
+.reveal-d4 { --reveal-delay: 320ms; }
+.reveal-d5 { --reveal-delay: 400ms; }
+
+/* WhatsApp 悬浮按钮：极缓「呼吸」光环（低调引导转化） */
+.wa-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(37, 211, 102, 0.35);
+  animation: waBreath 3.4s ease-out infinite;
+  z-index: -1;
+}
+@keyframes waBreath {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(1.65); opacity: 0; }
+}
+
+/* 进场动画（保留旧类） */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-rise {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* =========================================================
+   Nyra 编辑风工具类（浅色 · 克制 · 大留白）
+   ========================================================= */
+/* 真·shader 岛屿淡入（等 WebGL 画布就绪，避免突兀弹出） */
+.shader-fade { animation: shaderIn 1.6s ease 0.35s both; }
+@keyframes shaderIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 英雄区鼠标光晕 + 延迟拖尾（暖琥珀头 + 钢青尾，screen 混合提亮流光；
+   仅首页 hero，dots 由内联脚本生成定位；触屏 / 降低动态时脚本不启用） */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero-glow > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: transform;
+}
+.hero-glow.is-active > span { opacity: 1; }
+
+/* 大字段落标题：优雅衬线 + 加粗，编辑感强（用户指定加粗 + 设计感字体） */
+.statement {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.28;
+  color: var(--color-ink);
+}
+
+/* 产品系列 Tab 切换 */
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  color: var(--color-ink-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--color-ink); background: var(--color-sand); }
+.tab-active,
+.tab-active:hover { color: #fff; background: var(--color-ink); }
+
+/* 数据 / 参数卡（呼应 Nyra data cards，深色高级感） */
+.spec-card {
+  position: relative;
+  border-radius: var(--radius-xl2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, #0c1922, #0a141c);
+  overflow: hidden;
+  isolation: isolate;
+}
+.spec-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(80% 60% at 80% 0%, rgba(46, 143, 168, 0.18), transparent 60%);
+  z-index: -1;
+}
+
+/* 细等距「波形」装饰（呼应 Nyra equalizer 母题；克制的动态感） */
+.eq-bars { display: flex; align-items: flex-end; gap: 3px; height: 1.75rem; }
+.eq-bars > i {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--color-steel-light), var(--color-ocean));
+  transform-origin: bottom;
+  animation: eqPulse 1.5s ease-in-out infinite;
+}
+@keyframes eqPulse {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.55; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* ---------------------------------------------------------
+   博客正文 (prose) 品牌化
+   --------------------------------------------------------- */
+.prose {
+  --tw-prose-body: #33424f;
+  --tw-prose-headings: var(--color-ink);
+  --tw-prose-links: var(--color-ocean);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-quotes: var(--color-ink-soft);
+  --tw-prose-quote-borders: var(--color-steel);
+  --tw-prose-bullets: var(--color-steel);
+  --tw-prose-hr: var(--color-line);
+  max-width: 72ch;
+}
+.prose a {
+  text-underline-offset: 3px;
+}
+
+/* =========================================================
+   降低动态偏好（无障碍）：关闭所有非必要动效
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .brand-hero::before,
+  .brand-hero::after,
+  .accent-ring::before,
+  .accent-ring::after,
+  .gradient-text-anim,
+  .spin-slow,
+  .wa-ring::before,
+  .eq-bars > i,
+  .shader-fade,
+  .animate-rise {
+    animation: none !important;
+  }
+  .shader-fade { opacity: 1; }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .sheen::after { display: none; }
+  .btn { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+}

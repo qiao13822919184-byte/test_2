@@ -1,9 +1,80 @@
-<footer class="bg-gray-50 border-t border-gray-200 mt-20">
-  <div class="max-w-6xl mx-auto px-4 py-12 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
-    <p>© {new Date().getFullYear()} ACME Tech. All rights reserved.</p>
-    <div class="flex gap-4 mt-4 md:mt-0">
-      <a href="#" class="hover:text-black">隐私政策</a>
-      <a href="#" class="hover:text-black">服务条款</a>
+---
+import site from '../data/site.json';
+
+const year = new Date().getFullYear();
+const waLink = `https://wa.me/${site.contact.whatsappDigits}`;
+
+const cols = [
+  {
+    title: '产品',
+    links: [
+      { label: '餐具套装', href: '/products?cat=flatware-sets' },
+      { label: '刀叉勺单品', href: '/products?cat=cutlery' },
+      { label: '厨房用具', href: '/products?cat=kitchenware' },
+      { label: '餐桌用品', href: '/products?cat=tableware' },
+    ],
+  },
+  {
+    title: '公司',
+    links: [
+      { label: '关于我们', href: '/about' },
+      { label: '博客', href: '/blog' },
+      { label: '联系我们', href: '/contact' },
+      { label: '所有产品', href: '/products' },
+    ],
+  },
+];
+---
+<footer class="mt-24 brand-hero text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] reveal">
+    <!-- Brand -->
+    <div>
+      <div class="flex items-center gap-3 mb-4">
+        <span class="brand-gradient w-10 h-10 rounded-xl grid place-items-center shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3v7a2 2 0 0 0 4 0V3M8 11v10M16 3c-1.5 0-2.5 1.8-2.5 4.5S14.5 12 16 12v9" />
+          </svg>
+        </span>
+        <span class="font-display font-extrabold text-xl">{site.logoText}</span>
+      </div>
+      <p class="text-white/70 text-sm leading-relaxed max-w-xs">{site.description}</p>
+    </div>
+
+    {cols.map((col) => (
+      <div>
+        <h3 class="font-display font-semibold text-white/90 mb-4 tracking-wide">{col.title}</h3>
+        <ul class="space-y-2.5 text-sm">
+          {col.links.map((l) => (
+            <li><a href={l.href} class="inline-flex items-center text-white/65 hover:text-white transition-colors duration-200 hover:translate-x-0.5 will-change-transform">{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+
+    <!-- Contact -->
+    <div>
+      <h3 class="font-display font-semibold text-white/90 mb-4 tracking-wide">联系</h3>
+      <ul class="space-y-2.5 text-sm text-white/70">
+        <li class="flex items-start gap-2">
+          <span class="text-steel-light">✉</span>
+          <a href={`mailto:${site.contact.email}`} class="hover:text-white break-all">{site.contact.email}</a>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-steel-light"></span>
+          <a href={waLink} target="_blank" rel="noopener" data-wa data-wa-product="footer" class="hover:text-white">WhatsApp: {site.contact.whatsappDisplay}</a>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-steel-light"></span>
+          <span>{site.contact.addressLine}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/55 text-xs">
+      <p>© {year} {site.companyName}. 版权所有.</p>
+      <p>{site.tagline} · {site.contact.businessHours}</p>
     </div>
   </div>
 </footer>
