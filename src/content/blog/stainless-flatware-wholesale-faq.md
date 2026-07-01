@@ -1,10 +1,13 @@
 ---
-title: "不锈钢餐具批发常见问题（MOQ、交期与定制）"
-description: "关于不锈钢餐具批发的 8 个高频问题：最小起订量、交期、定制 LOGO、包装与出口，帮助采购商一次看懂合作流程。"
-date: 2026-06-10
-author: "Yumingxing"
-cover: "https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?q=80&w=1400&auto=format&fit=crop"
-tags: ["批发指南", "FAQ", "采购流程"]
+title: 不锈钢餐具批发常见问题（MOQ、交期与定制）
+description: 关于不锈钢餐具批发的 8 个高频问题：最小起订量、交期、定制 LOGO、包装与出口，帮助采购商一次看懂合作流程。
+date: 2026-07-02
+author: Yumingxing
+cover: /uploads/21.png
+tags:
+  - 批发指南
+  - FAQ
+  - 采购流程
 ---
 
 第一次从工厂批发不锈钢餐具，往往有很多疑问。我们整理了采购商最常问的 8 个问题，帮助你更快地评估合作。
